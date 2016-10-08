@@ -3,7 +3,7 @@
 class BotLogic < BaseBotLogic
 
 	def self.setup
-		set_welcome_message "Welcome!"
+		set_welcome_message "Hi! Ich informiere dich über das Sauwetter :pig: :sunny: :umbrella:"
 		set_get_started_button "bot_start_payload"
 		set_bot_menu
 	end
@@ -18,30 +18,36 @@ class BotLogic < BaseBotLogic
 
     # reply_message, reply_image, reply_html
 
-		if @request_type == "CALLBACK" and @fb_params.payload == "RESET_BOT"
-      @current_user.delete
-			reply_message "Removed all your data from our servers."
-      reply_message "Hello"
-			return
-		end
+    if @request_type == "CALLBACK"
+      case @fb_params.payload
+      when "RESET_BOT"
+        @current_user.delete
+        reply_message "Removed all your data from our servers."
+        reply_message "Hello"
+        return
+      end
+    end
 
+    state_action 0, :greeting
+    state_action 1, :greeting
+    state_action 2, :greeting
+    state_action 3, :greeting
+	end
+
+  def self.weather
     response = HTTParty.get("http://wetter.orf.at/api/json/1.0/package")
 
     hash = JSON.parse(response.body)
-    temperature = hash['wien']['current']['temperature']
-    chance_of_rain = hash['wien']['current']['precipitation']
+    city = 'tirol'
+    temperature = hash[city]['current']['temperature']
+    chance_of_rain = hash[city]['current']['precipitation']
 
     reply_message ":pig: It's currently #{temperature} degrees with a #{chance_of_rain}% chance of rain :pig:"
     reply_image "http://2.bp.blogspot.com/-0IGtrfdfo64/UKa8VZGPjFI/AAAAAAAAT1Y/YmBfbskVT7A/s1600/1-article-0-15EF52D0000005DC-855_968x631.jpg"
-
-    #state_action 0, :greeting
-    #state_action 1, :subscribe
-    #state_action 2, :confirm
-    #state_action 3, :onboarded
-	end
+  end
 
 	def self.greeting
-		reply_message "Hello"
+		reply_quick_reply "Please pick your bundesland", %W(Wien Kärnten Burgenland Tirol Salzburg Steiermark Vorarlberg Niederösterreich Oberösterreich)
 		state_go
 	end
 
