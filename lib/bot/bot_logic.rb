@@ -28,7 +28,7 @@ class BotLogic < BaseBotLogic
       end
     end
 
-    state_action 0, :greeting
+    state_action 0, :bundesland
     state_action 1, :greeting
     state_action 2, :greeting
     state_action 3, :greeting
@@ -46,7 +46,7 @@ class BotLogic < BaseBotLogic
     reply_image "http://2.bp.blogspot.com/-0IGtrfdfo64/UKa8VZGPjFI/AAAAAAAAT1Y/YmBfbskVT7A/s1600/1-article-0-15EF52D0000005DC-855_968x631.jpg"
   end
 
-	def self.greeting
+	def self.bundesland
 		reply_quick_reply "Please pick your bundesland", %W(Wien Kärnten Burgenland Tirol Salzburg Steiermark Vorarlberg Niederösterreich Oberösterreich)
 		state_go
 	end
