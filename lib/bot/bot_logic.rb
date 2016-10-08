@@ -13,26 +13,37 @@ class BotLogic < BaseBotLogic
 	end
 
 	def self.bot_logic
-		ENV["DOMAIN_NAME"] = "https://82be97d0.ngrok.io"
+		ENV["DOMAIN_NAME"] = "https://9ec6211c.ngrok.io"
 
-		#binding.pry
+
+    # reply_message, reply_image, reply_html
 
 		if @request_type == "CALLBACK" and @fb_params.payload == "RESET_BOT"
-			@current_user.delete
+      @current_user.delete
 			reply_message "Removed all your data from our servers."
+      reply_message "Hello"
 			return
 		end
 
-		state_action 0, :greeting
-		state_action 1, :subscribe
-		state_action 2, :confirm
-		state_action 3, :onboarded
+    response = HTTParty.get("http://wetter.orf.at/api/json/1.0/package")
+
+    hash = JSON.parse(response.body)
+    temperature = hash['wien']['current']['temperature']
+    chance_of_rain = hash['wien']['current']['precipitation']
+
+    reply_message ":pig: It's currently #{temperature} degrees with a #{chance_of_rain}% chance of rain :pig:"
+    reply_image "http://2.bp.blogspot.com/-0IGtrfdfo64/UKa8VZGPjFI/AAAAAAAAT1Y/YmBfbskVT7A/s1600/1-article-0-15EF52D0000005DC-855_968x631.jpg"
+
+    #state_action 0, :greeting
+    #state_action 1, :subscribe
+    #state_action 2, :confirm
+    #state_action 3, :onboarded
 	end
 
 	def self.greeting
-		reply_message "To make it a little easy. Could you type your due date again just this way: 28-04-2017?"
+		reply_message "Hello"
 		state_go
-	end 
+	end
 
 	def self.subscribe
 		due_date = Date.parse get_message
@@ -41,14 +52,14 @@ class BotLogic < BaseBotLogic
 		@current_user.save!
 
 		reply_quick_reply "Okay #{due_date.to_s}. Did I get it right?"
-		state_go		
+		state_go
 	rescue ArgumentError
 		reply_message "{Sorry I do not undestand this format|Can you try again? Format is DD/MM/YYYY}"
-	end 
+	end
 
 	def self.confirm
 		if get_message == "Yes"
-			subscribe_user("pregnant")	
+			subscribe_user("pregnant")
 			state_go
 			reply_message "Awwww sweet! You are all set now. I'll start to track your pregnancy for you. Can't wait :bride_with_veil::heart::baby_bottle:"
 		else
@@ -56,17 +67,17 @@ class BotLogic < BaseBotLogic
 			@current_user.profile = {}
 			@current_user.save!
 			state_reset
-		end		
+		end
 	end
 
 	def self.onboarded
-		output_current_week		
-	end 
+		output_current_week
+	end
 
 	### helper functions
 
 	def self.calculate_current_week
-		user_date = Date.parse @current_user.profile[:due_date] 
+		user_date = Date.parse @current_user.profile[:due_date]
 		server_date = Date.parse Time.now.to_s
 
 		40 - ((user_date - server_date).to_i / 7)
