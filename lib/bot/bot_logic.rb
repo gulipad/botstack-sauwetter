@@ -29,9 +29,19 @@ class BotLogic < BaseBotLogic
     end
 
     state_action 0, :bundesland
-    state_action 1, :greeting
+    state_action 1, :set_time
     state_action 2, :greeting
     state_action 3, :greeting
+	end
+
+	def set_time
+		location = get_message
+
+		@current_user.profile = {location: location}
+		@current_user.save!
+
+		reply_quick_reply "Oink! At what time would you like me to let you know what the weather will pig like?", %W(7AM 8AM 9AM 10AM)
+		state_go
 	end
 
   def self.weather
