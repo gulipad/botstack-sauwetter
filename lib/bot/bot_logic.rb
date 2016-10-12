@@ -30,7 +30,7 @@ class BotLogic < BaseBotLogic
 
     state_action 0, :bundesland
     state_action 1, :set_time
-    state_action 2, :greeting
+    state_action 2, :got_time
     state_action 3, :greeting
 	end
 
@@ -44,19 +44,17 @@ class BotLogic < BaseBotLogic
 		state_go
 	end
 
-  def self.weather
-    response = HTTParty.get("http://wetter.orf.at/api/json/1.0/package")
-
-    hash = JSON.parse(response.body)
-    city = 'tirol'
-    temperature = hash[city]['current']['temperature']
-    chance_of_rain = hash[city]['current']['precipitation']
-
-    reply_message ":pig: It's currently #{temperature} degrees with a #{chance_of_rain}% chance of rain :pig:"
-    reply_image "http://2.bp.blogspot.com/-0IGtrfdfo64/UKa8VZGPjFI/AAAAAAAAT1Y/YmBfbskVT7A/s1600/1-article-0-15EF52D0000005DC-855_968x631.jpg"
+  def self.got_time
+    reply_message "Great! I'll send you your weather update at #{get_message}"
+    self.send_weather
+    state_go
   end
 
-	def self.bundesland
+  def self.weather
+    self.send_weather
+  end
+
+	def self.location
 		reply_quick_reply "Please pick your bundesland", %W(Wien Kärnten Burgenland Tirol Salzburg Steiermark Vorarlberg Niederösterreich Oberösterreich)
 		state_go
 	end
@@ -103,5 +101,17 @@ class BotLogic < BaseBotLogic
 		current_week = calculate_current_week
 		reply_message "you are in week number #{current_week}"
 	end
+
+  def self.send_weather
+    response = HTTParty.get("http://wetter.orf.at/api/json/1.0/package")
+
+    hash = JSON.parse(response.body)
+    location = @current_user.profile[:location].downcase
+    temperature = hash[location]['current']['temperature']
+    chance_of_rain = hash[location]['current']['precipitation']
+
+    reply_message ":pig: It's currently #{temperature} degrees with a #{chance_of_rain}% chance of rain :pig:"
+    reply_image "http://2.bp.blogspot.com/-0IGtrfdfo64/UKa8VZGPjFI/AAAAAAAAT1Y/YmBfbskVT7A/s1600/1-article-0-15EF52D0000005DC-855_968x631.jpg"
+  end
 
 end
