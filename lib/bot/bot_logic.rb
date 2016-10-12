@@ -123,7 +123,32 @@ class BotLogic < BaseBotLogic
     chance_of_rain = hash[location]['current']['precipitation']
 
     reply_message ":pig: It's currently #{temperature} degrees with a #{chance_of_rain}% chance of rain :pig:"
-    reply_image "http://2.bp.blogspot.com/-0IGtrfdfo64/UKa8VZGPjFI/AAAAAAAAT1Y/YmBfbskVT7A/s1600/1-article-0-15EF52D0000005DC-855_968x631.jpg"
+
+    piggy_pics = {}
+    CSV.foreach('lib/tasks/weatherpigs.csv', headers: true) do |row|
+      piggy_pics[row['WEATHER']] ||= []
+      piggy_pics[row['WEATHER']] << row['URL']
+    end
+
+
+    if temperature.to_f < 10
+      reply_message "It's a little cold out. Don't forget your scarf on the way out!"
+      images = piggy_pics['cold']
+    else
+      reply_message "It's sweltering! Got time for a swim today?"
+      images = piggy_pics['sunny']
+    end
+
+    if chance_of_rain > 20
+      images = piggy_pics['rainy']
+    end
+
+
+    reply_image images.sample
+
+
+
+
   end
 
 end
