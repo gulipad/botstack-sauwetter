@@ -2,6 +2,8 @@
 
 class BotLogic < BaseBotLogic
 
+  BUNDESLAENDER = %W(Wien Kärnten Burgenland Tirol Salzburg Steiermark Vorarlberg Niederösterreich Oberösterreich)
+
 	def self.setup
 		set_welcome_message "Hi! Ich informiere dich über das Sauwetter :pig: :sunny: :umbrella:"
 		set_get_started_button "bot_start_payload"
@@ -28,13 +30,13 @@ class BotLogic < BaseBotLogic
       end
     end
 
-    state_action 0, :bundesland
+    state_action 0, :location
     state_action 1, :set_time
     state_action 2, :got_time
-    state_action 3, :greeting
+    state_action 3, :weather
 	end
 
-	def set_time
+  def self.set_time
 		location = get_message
 
 		@current_user.profile = {location: location}
@@ -45,6 +47,13 @@ class BotLogic < BaseBotLogic
 	end
 
   def self.got_time
+    begin
+      due_date = Date.parse get_message
+      @current_user.profile.merge time: due_date.to_s
+      @current_user.save!
+    rescue ArgumentError
+    end
+
     reply_message "Great! I'll send you your weather update at #{get_message}"
     self.send_weather
     state_go
@@ -55,7 +64,7 @@ class BotLogic < BaseBotLogic
   end
 
 	def self.location
-		reply_quick_reply "Please pick your bundesland", %W(Wien Kärnten Burgenland Tirol Salzburg Steiermark Vorarlberg Niederösterreich Oberösterreich)
+		reply_quick_reply "Please pick your bundesland", BUNDESLAENDER
 		state_go
 	end
 
@@ -106,7 +115,10 @@ class BotLogic < BaseBotLogic
     response = HTTParty.get("http://wetter.orf.at/api/json/1.0/package")
 
     hash = JSON.parse(response.body)
-    location = @current_user.profile[:location].downcase
+    if @current_user.profile
+      location = @current_user.profile[:location].downcase if BUNDESLAENDER.include?(@current_user.profile[:location].capitalize)
+    end
+    location ||= 'wien'
     temperature = hash[location]['current']['temperature']
     chance_of_rain = hash[location]['current']['precipitation']
 
