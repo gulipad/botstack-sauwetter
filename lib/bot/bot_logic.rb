@@ -140,6 +140,7 @@ class BotLogic < BaseBotLogic
     end
 
     if chance_of_rain > 20
+      reply_message "Look out! It's very likely going to rain! Be sure to wear some boots and an umbrella."
       images = piggy_pics['rainy']
     end
 
