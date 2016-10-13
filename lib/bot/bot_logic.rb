@@ -53,7 +53,7 @@ class BotLogic < BaseBotLogic
     rescue ArgumentError
     end
 
-    reply_message "Ist gut! Ich sende dir um #{get_message} deine Wetterinfo."
+    reply_message "Super! Ich schicke dir deine Wetterinfos um #{get_message} (Ich arbeite noch dran). In der Zwischenzeit ..."
     self.send_weather
     state_go
   end
