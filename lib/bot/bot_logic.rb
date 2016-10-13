@@ -25,7 +25,6 @@ class BotLogic < BaseBotLogic
       when "RESET_BOT"
         @current_user.delete
         reply_message "Removed all your data from our servers."
-        reply_message "Hello"
         return
       end
     end
@@ -42,7 +41,7 @@ class BotLogic < BaseBotLogic
 		@current_user.profile = {location: location}
 		@current_user.save!
 
-		reply_quick_reply "Oink! At what time would you like me to let you know what the weather will pig like?", %W(7AM 8AM 9AM 10AM)
+		reply_quick_reply "Oink! Zu welcher Uhrzeit soll ich dir sagen, wie das (Sau-)Wetter wird?", %W(7AM 8AM 9AM 10AM)
 		state_go
 	end
 
@@ -54,7 +53,7 @@ class BotLogic < BaseBotLogic
     rescue ArgumentError
     end
 
-    reply_message "Great! I'll send you your weather update at #{get_message}"
+    reply_message "Ist gut! Ich sende dir um #{get_message} deine Wetterinfo."
     self.send_weather
     state_go
   end
@@ -64,7 +63,7 @@ class BotLogic < BaseBotLogic
   end
 
 	def self.location
-		reply_quick_reply "Please pick your bundesland", BUNDESLAENDER
+		reply_quick_reply "Bitte wähl dein Bundesland!", BUNDESLAENDER
 		state_go
 	end
 
@@ -124,7 +123,7 @@ class BotLogic < BaseBotLogic
     temperature = hash[location]['current']['temperature']
     chance_of_rain = hash[location]['current']['precipitation']
 
-    reply_message ":pig: It's currently #{temperature} degrees with a #{chance_of_rain}% chance of rain :pig:"
+    reply_message ":pig: Im bundesland #{location} hat es gerade #{temperature} Grad und eine Regenwahrscheinlichkeit von #{chance_of_rain}%. :pig:"
 
     piggy_pics = {}
     CSV.foreach('lib/tasks/weatherpigs.csv', headers: true) do |row|
@@ -134,15 +133,15 @@ class BotLogic < BaseBotLogic
 
 
     if temperature.to_f < 10
-      reply_message "It's a little cold out. Don't forget your scarf on the way out!"
+      reply_message "Es ist kühl heute. Denk an deinen Schal, wenn du rausgehst!"
       images = piggy_pics['cold']
     else
-      reply_message "It's sweltering! Got time for a swim today?"
+      reply_message "Ein richtig heißer Tag. Sollen wir baden gehen?"
       images = piggy_pics['sunny']
     end
 
     if chance_of_rain > 20
-      reply_message "Look out! It's very likely going to rain! Be sure to wear some boots and an umbrella."
+      reply_message "Oh! Wahrscheinlich wird es regnen. Heute ist ein Tag für Gummistiefel und einen Schirm."
       images = piggy_pics['rainy']
     end
 
