@@ -118,6 +118,7 @@ class BotLogic < BaseBotLogic
       location = @current_user.profile[:location].downcase if BUNDESLAENDER.include?(@current_user.profile[:location].capitalize)
     end
     location ||= 'wien'
+    location_name = location.capitalize
     location.gsub! /ö/, 'oe'
     location.gsub! /ä/, 'ae'
     location.gsub! /ü/, 'ue'
@@ -125,7 +126,7 @@ class BotLogic < BaseBotLogic
     temperature = hash[location]['current']['temperature']
     chance_of_rain = hash[location]['current']['precipitation']
 
-    reply_message ":pig: Im bundesland #{location} hat es gerade #{temperature} Grad und eine Regenwahrscheinlichkeit von #{chance_of_rain}%. :pig:"
+    reply_message ":pig: Im bundesland #{location_name} hat es gerade #{temperature} Grad und eine Regenwahrscheinlichkeit von #{chance_of_rain}%. :pig:"
 
     piggy_pics = {}
     CSV.foreach('lib/tasks/weatherpigs.csv', headers: true) do |row|
