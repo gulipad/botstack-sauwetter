@@ -119,6 +119,7 @@ class BotLogic < BaseBotLogic
       location = @current_user.profile[:location].downcase if BUNDESLAENDER.include?(@current_user.profile[:location].capitalize)
     end
     location ||= 'wien'
+    location.gsub! /ö/, 'oe'
     puts location
     temperature = hash[location]['current']['temperature']
     chance_of_rain = hash[location]['current']['precipitation']
