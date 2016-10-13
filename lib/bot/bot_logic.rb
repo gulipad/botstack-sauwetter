@@ -7,7 +7,7 @@ class BotLogic < BaseBotLogic
 	def self.setup
 		set_welcome_message "Hi! Ich informiere dich über das Sauwetter :pig: :sunny: :umbrella:"
 		set_get_started_button "bot_start_payload"
-		set_bot_menu
+		set_bot_menu %W(Reset)
 	end
 
 	def self.cron
