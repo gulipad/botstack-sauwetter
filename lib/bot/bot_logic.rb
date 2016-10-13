@@ -119,6 +119,8 @@ class BotLogic < BaseBotLogic
     end
     location ||= 'wien'
     location.gsub! /ö/, 'oe'
+    location.gsub! /ä/, 'ae'
+    location.gsub! /ü/, 'ue'
     puts location
     temperature = hash[location]['current']['temperature']
     chance_of_rain = hash[location]['current']['precipitation']
