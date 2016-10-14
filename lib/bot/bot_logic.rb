@@ -7,7 +7,7 @@ class BotLogic < BaseBotLogic
 	def self.setup
 		set_welcome_message "Hi! Ich informiere dich über das Sauwetter :pig: :sunny: :umbrella:"
 		set_get_started_button "bot_start_payload"
-		set_bot_menu %W(Reset)
+		set_bot_menu %W(Reset Wetterbericht)
 	end
 
 	def self.cron
@@ -25,6 +25,9 @@ class BotLogic < BaseBotLogic
       when "RESET_BOT"
         @current_user.delete
         reply_message "Removed all your data from our servers."
+        return
+      when "WETTERBERICHT_BOT"
+        self.send_weather
         return
       end
     end
