@@ -138,7 +138,7 @@ class BotLogic < BaseBotLogic
     end
 
 
-    if temperature.to_f < 10
+    if temperature.to_f < 15
       reply_message "Es ist kühl heute. Denk an deinen Schal, wenn du rausgehst!"
       images = piggy_pics['cold']
     else
